@@ -1,29 +1,16 @@
-# Llama Forge Template
+# Gitcoin <> Radicle Public Goods Alliance
 
-This template is inspired by [Cleanunicorn's template](https://github.com/cleanunicorn/ethereum-smartcontract-template).
+This repository contains the swap contract and respective proposal payloads for Gitcoin and Radicle Governance.
 
 ## Installation
 
 It requires [Foundry](https://github.com/gakonst/foundry) installed to run. You can find instructions here [Foundry installation](https://github.com/gakonst/foundry#installation).
 
-### GitHub template
-
-It's easiest to start a new project by clicking the ["Use this template"](https://github.com/llama-community/llama-forge-template).
-
-Then clone the templated repository locally and `cd` into it and run the following commands:
+To set up the project manually, run the following commands:
 
 ```sh
-$ npm install
-$ forge install
-```
-
-### Manual installation
-
-If you want to create your project manually, run the following commands:
-
-```sh
-$ forge init --template https://github.com/llama-community/llama-forge-template <my-repo>
-$ cd <my-repo>
+$ git clone https://github.com/llama-community/gtc-rad-public-goods-alliance.git
+$ cd gtc-rad-public-goods-alliance
 $ npm install
 $ forge install
 ```
