@@ -12,17 +12,10 @@ import {GtcRadSwap} from "../GtcRadSwap.sol";
 
 contract GtcRadSwapTest is DSTestPlus, stdCheats {
     Vm private vm = Vm(HEVM_ADDRESS);
-    GtcRadSwap public numContract;
-    uint256 public constant originalNumber = 7;
+    GtcRadSwap public gtcRadSwap;
 
     function setUp() public {
-        numContract = new GtcRadSwap(originalNumber);
-        vm.label(address(numContract), "Contract");
-    }
-
-    function testSetNum(uint256 x) public {
-        assertEq(numContract.num(), originalNumber);
-        numContract.changeNum(x);
-        assertEq(numContract.num(), x);
+        gtcRadSwap = new GtcRadSwap(500000e18, 885990e18);
+        vm.label(address(gtcRadSwap), "GtcRadSwap");
     }
 }
