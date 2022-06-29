@@ -27,7 +27,7 @@ contract GtcRadSwap {
      *   STORAGE VARIABLES   *
      *************************/
 
-    bool private hasSwapOccured;
+    bool public hasSwapOccured;
 
     /**************
      *   EVENTS   *
@@ -48,7 +48,6 @@ contract GtcRadSwap {
     constructor(uint256 _gtcAmount, uint256 _radAmount) {
         gtcAmount = _gtcAmount;
         radAmount = _radAmount;
-        hasSwapOccured = false;
     }
 
     /*****************
