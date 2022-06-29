@@ -55,7 +55,7 @@ contract GtcRadSwap {
      *   FUNCTIONS   *
      *****************/
 
-    /// @notice Atomically swap pre-determined token amounts b/w GTC and RAD treasuries
+    /// @notice Atomically swap pre-determined and pre-approved token amounts b/w GTC and RAD treasuries
     function swap() external {
         // Check in case of infinite approvals and prevent a second swap
         if (hasSwapOccured) revert SwapAlreadyOccured();
