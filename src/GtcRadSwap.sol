@@ -33,7 +33,7 @@ contract GtcRadSwap {
      *   EVENTS   *
      **************/
 
-    event Swap(uint256 gtcAmount, uint256 radAmount);
+    event Swap(address indexed gtcTreasury, address indexed radTreasury, uint256 gtcAmount, uint256 radAmount);
 
     /****************************
      *   ERRORS AND MODIFIERS   *
@@ -64,6 +64,6 @@ contract GtcRadSwap {
         GTC.safeTransferFrom(GTC_DAO_TREASURY, RAD_DAO_TREASURY, gtcAmount);
         RAD.safeTransferFrom(RAD_DAO_TREASURY, GTC_DAO_TREASURY, radAmount);
 
-        emit Swap(gtcAmount, radAmount);
+        emit Swap(GTC_DAO_TREASURY, RAD_DAO_TREASURY, gtcAmount, radAmount);
     }
 }
