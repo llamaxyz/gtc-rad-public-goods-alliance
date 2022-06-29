@@ -23,11 +23,23 @@ contract GtcRadSwap {
     uint256 public immutable gtcAmount;
     uint256 public immutable radAmount;
 
+    /*************************
+     *   STORAGE VARIABLES   *
+     *************************/
+
+    bool private hasSwapOccured;
+
     /**************
      *   EVENTS   *
      **************/
 
     event Swap(uint256 gtcAmount, uint256 radAmount);
+
+    /****************************
+     *   ERRORS AND MODIFIERS   *
+     ****************************/
+
+    error SwapAlreadyOccured();
 
     /*******************
      *   CONSTRUCTOR   *
@@ -36,6 +48,7 @@ contract GtcRadSwap {
     constructor(uint256 _gtcAmount, uint256 _radAmount) {
         gtcAmount = _gtcAmount;
         radAmount = _radAmount;
+        hasSwapOccured = false;
     }
 
     /*****************
@@ -44,8 +57,13 @@ contract GtcRadSwap {
 
     /// @notice Atomically swap pre-determined token amounts b/w GTC and RAD treasuries
     function swap() external {
+        // Check in case of infinite approvals and prevent a second swap
+        if (hasSwapOccured) revert SwapAlreadyOccured();
+        hasSwapOccured = true;
+
         GTC.safeTransferFrom(GTC_DAO_TREASURY, RAD_DAO_TREASURY, gtcAmount);
         RAD.safeTransferFrom(RAD_DAO_TREASURY, GTC_DAO_TREASURY, radAmount);
+
         emit Swap(gtcAmount, radAmount);
     }
 }
