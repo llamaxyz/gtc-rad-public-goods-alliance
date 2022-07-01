@@ -4,10 +4,10 @@ pragma solidity ^0.8.15;
 import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/token/ERC20/utils/SafeERC20.sol";
 
-/// @title GtcRadSwap
+/// @title GtcRadGrant
 /// @author Llama
-/// @notice GTC <> RAD Public Goods Alliance swap contract
-contract GtcRadSwap {
+/// @notice GTC <> RAD Public Goods Alliance grant contract
+contract GtcRadGrant {
     using SafeERC20 for IERC20;
 
     /********************************
@@ -27,19 +27,19 @@ contract GtcRadSwap {
      *   STORAGE VARIABLES   *
      *************************/
 
-    bool public hasSwapOccured;
+    bool public hasGrantOccured;
 
     /**************
      *   EVENTS   *
      **************/
 
-    event Swap(address indexed gtcTreasury, address indexed radTreasury, uint256 gtcAmount, uint256 radAmount);
+    event Grant(address indexed gtcTreasury, address indexed radTreasury, uint256 gtcAmount, uint256 radAmount);
 
     /****************************
      *   ERRORS AND MODIFIERS   *
      ****************************/
 
-    error SwapAlreadyOccured();
+    error GrantAlreadyOccured();
 
     /*******************
      *   CONSTRUCTOR   *
@@ -54,15 +54,15 @@ contract GtcRadSwap {
      *   FUNCTIONS   *
      *****************/
 
-    /// @notice Atomically swap pre-determined and pre-approved token amounts b/w GTC and RAD treasuries
-    function swap() external {
+    /// @notice Atomically grant pre-determined and pre-approved token amounts b/w GTC and RAD treasuries
+    function grant() external {
         // Check in case of infinite approvals and prevent a second swap
-        if (hasSwapOccured) revert SwapAlreadyOccured();
-        hasSwapOccured = true;
+        if (hasGrantOccured) revert GrantAlreadyOccured();
+        hasGrantOccured = true;
 
         GTC.safeTransferFrom(GTC_DAO_TREASURY, RAD_DAO_TREASURY, gtcAmount);
         RAD.safeTransferFrom(RAD_DAO_TREASURY, GTC_DAO_TREASURY, radAmount);
 
-        emit Swap(GTC_DAO_TREASURY, RAD_DAO_TREASURY, gtcAmount, radAmount);
+        emit Grant(GTC_DAO_TREASURY, RAD_DAO_TREASURY, gtcAmount, radAmount);
     }
 }
