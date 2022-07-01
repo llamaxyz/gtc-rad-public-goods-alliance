@@ -20,8 +20,8 @@ contract GtcRadGrant {
     IERC20 public constant GTC = IERC20(0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F);
     IERC20 public constant RAD = IERC20(0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3);
 
-    uint256 public immutable gtcAmount;
-    uint256 public immutable radAmount;
+    uint256 public immutable GTC_AMOUNT;
+    uint256 public immutable RAD_AMOUNT;
 
     /*************************
      *   STORAGE VARIABLES   *
@@ -46,8 +46,8 @@ contract GtcRadGrant {
      *******************/
 
     constructor(uint256 _gtcAmount, uint256 _radAmount) {
-        gtcAmount = _gtcAmount;
-        radAmount = _radAmount;
+        GTC_AMOUNT = _gtcAmount;
+        RAD_AMOUNT = _radAmount;
     }
 
     /*****************
@@ -60,9 +60,10 @@ contract GtcRadGrant {
         if (hasGrantOccured) revert GrantAlreadyOccured();
         hasGrantOccured = true;
 
-        GTC.safeTransferFrom(GTC_DAO_TREASURY, RAD_DAO_TREASURY, gtcAmount);
-        RAD.safeTransferFrom(RAD_DAO_TREASURY, GTC_DAO_TREASURY, radAmount);
+        // Execute the GTC <> RAD Public Goods Alliance grant
+        GTC.safeTransferFrom(GTC_DAO_TREASURY, RAD_DAO_TREASURY, GTC_AMOUNT);
+        RAD.safeTransferFrom(RAD_DAO_TREASURY, GTC_DAO_TREASURY, RAD_AMOUNT);
 
-        emit Grant(GTC_DAO_TREASURY, RAD_DAO_TREASURY, gtcAmount, radAmount);
+        emit Grant(GTC_DAO_TREASURY, RAD_DAO_TREASURY, GTC_AMOUNT, RAD_AMOUNT);
     }
 }
