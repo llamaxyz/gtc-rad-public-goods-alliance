@@ -6,7 +6,7 @@ import {IGitcoinToken} from "./external/IGitcoinToken.sol";
 /// @title RadProposalPayload2
 /// @author Llama
 /// @notice Provides an execute function for Radicle governance to delegate received GTC tokens to the Radicle Multisig
-contract RadProposalPayload1 {
+contract RadProposalPayload2 {
     /********************************
      *   CONSTANTS AND IMMUTABLES   *
      ********************************/
