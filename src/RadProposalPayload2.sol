@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.15;
 
-import {IRadicleToken} from "./external/IRadicleToken.sol";
+import {IGitcoinToken} from "./external/IGitcoinToken.sol";
 import {GtcRadGrant} from "./GtcRadGrant.sol";
 
 /// @title RadProposalPayload2
@@ -12,23 +12,15 @@ contract RadProposalPayload1 {
      *   CONSTANTS AND IMMUTABLES   *
      ********************************/
 
-    IRadicleToken public constant RAD = IRadicleToken(0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3);
+    IGitcoinToken public constant GTC = IGitcoinToken(0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F);
 
-    GtcRadGrant public immutable gtcRadGrant;
-    uint256 public immutable radAmount;
     address public immutable radMultisig;
 
     /*******************
      *   CONSTRUCTOR   *
      *******************/
 
-    constructor(
-        GtcRadGrant _gtcRadGrant,
-        uint256 _radAmount,
-        address _radMultisig
-    ) {
-        gtcRadGrant = _gtcRadGrant;
-        radAmount = _radAmount;
+    constructor(address _radMultisig) {
         radMultisig = _radMultisig;
     }
 
@@ -37,6 +29,6 @@ contract RadProposalPayload1 {
      *****************/
 
     function execute() external {
-        RAD.delegate(radMultisig);
+        GTC.delegate(radMultisig);
     }
 }
