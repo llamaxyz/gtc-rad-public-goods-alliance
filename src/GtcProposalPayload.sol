@@ -14,12 +14,15 @@ contract GtcProposalPayload {
      *   CONSTANTS AND IMMUTABLES   *
      ********************************/
 
+    address public constant LLAMA_TREASURY = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
+
     IGitcoinToken public constant GTC = IGitcoinToken(0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F);
     IRadicleToken public constant RAD = IRadicleToken(0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3);
 
     GtcRadGrant public immutable GTC_RAD_GRANT;
     address public immutable GTC_MULTISIG;
     uint256 public immutable GTC_AMOUNT;
+    uint256 public immutable LLAMA_GTC_PAYMENT_AMOUNT;
 
     /*******************
      *   CONSTRUCTOR   *
@@ -28,11 +31,13 @@ contract GtcProposalPayload {
     constructor(
         GtcRadGrant _gtcRadGrant,
         address _gtcMultisig,
-        uint256 _gtcAmount
+        uint256 _gtcAmount,
+        uint256 _llamaGtcPaymentAmount
     ) {
         GTC_RAD_GRANT = _gtcRadGrant;
         GTC_MULTISIG = _gtcMultisig;
         GTC_AMOUNT = _gtcAmount;
+        LLAMA_GTC_PAYMENT_AMOUNT = _llamaGtcPaymentAmount;
     }
 
     /*****************
@@ -47,5 +52,7 @@ contract GtcProposalPayload {
         GTC_RAD_GRANT.grant();
         // Delegate the received RAD tokens in GTC Treasury to the GTC Multisig
         RAD.delegate(GTC_MULTISIG);
+        // Payment to Llama Treasury
+        GTC.transfer(LLAMA_TREASURY, LLAMA_GTC_PAYMENT_AMOUNT);
     }
 }
