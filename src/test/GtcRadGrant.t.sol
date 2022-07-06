@@ -51,10 +51,6 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
     GtcProposalPayload public gtcProposalPayload;
     RadProposalPayload2 public radProposalPayload2;
 
-    uint256 public radProposalId1;
-    uint256 public radProposalId2;
-    uint256 public gtcProposalId;
-
     address[] private radWhales = [
         0xEA95cfB5Dd624F43775b372db0ED2D8d0073E91C,
         0x464D78a5C97A2E2E9839C353ee9B6d4204c90B0b
@@ -86,9 +82,13 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         vm.label(RAD_MULTISIG, "RAD_MULTISIG");
     }
 
-    function _createRadicleProposal() public {
+    /***************************
+     *   Radicle Gov Process   *
+     ***************************/
+
+    function _createRadicleProposal(address radProposalPayload) private returns (uint256 proposalID) {
         address[] memory targets = new address[](1);
-        targets[0] = address(radProposalPayload1);
+        targets[0] = radProposalPayload;
         uint256[] memory values = new uint256[](1);
         values[0] = uint256(0);
         string[] memory signatures = new string[](1);
@@ -96,45 +96,53 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         bytes memory emptyBytes;
         bytes[] memory calldatas = new bytes[](1);
         calldatas[0] = emptyBytes;
-        string memory description = "gtcradswap";
+        string memory description = "GTC <> RAD Public Goods Alliance";
 
+        // Proposer that has > 1M RAD votes
         vm.prank(MOCK_RADICLE_PROPOSER);
-        radProposalId1 = RADICLE_GOVERNOR.propose(targets, values, signatures, calldatas, description);
+        proposalID = RADICLE_GOVERNOR.propose(targets, values, signatures, calldatas, description);
     }
 
-    function _voteOnProposal() public {
-        (, , uint256 startBlock, , , , , ) = RADICLE_GOVERNOR.proposals(radProposalId1);
+    function _voteOnProposal(uint256 proposalID) private {
+        (, , uint256 startBlock, , , , , ) = RADICLE_GOVERNOR.proposals(proposalID);
+        // Skipping Proposal delay of 1 block
         vm.roll(startBlock + 1);
+        // Hitting quorum of > 4M RAD votes
         for (uint256 i; i < radWhales.length; i++) {
             vm.prank(radWhales[i]);
-            RADICLE_GOVERNOR.castVote(radProposalId1, true);
+            RADICLE_GOVERNOR.castVote(proposalID, true);
         }
     }
 
-    function _skipVotingPeriod() public {
-        (, , , uint256 endBlock, , , , ) = RADICLE_GOVERNOR.proposals(radProposalId1);
+    function _skipVotingPeriod(uint256 proposalID) private {
+        (, , , uint256 endBlock, , , , ) = RADICLE_GOVERNOR.proposals(proposalID);
+        // Skipping Voting period of 3 days worth of blocks
         vm.roll(endBlock + 1);
     }
 
-    function _queueProposal() public {
-        RADICLE_GOVERNOR.queue(radProposalId1);
+    function _queueProposal(uint256 proposalID) private {
+        RADICLE_GOVERNOR.queue(proposalID);
     }
 
-    function _skipQueuePeriod() public {
-        (, uint256 eta, , , , , , ) = RADICLE_GOVERNOR.proposals(radProposalId1);
+    function _skipQueuePeriod(uint256 proposalID) private {
+        (, uint256 eta, , , , , , ) = RADICLE_GOVERNOR.proposals(proposalID);
         vm.warp(eta);
     }
 
-    function _executeProposal() public {
-        RADICLE_GOVERNOR.execute(radProposalId1);
+    function _executeProposal(uint256 proposalID) private {
+        RADICLE_GOVERNOR.execute(proposalID);
+    }
+
+    function _runRadicleGovProcess(address radProposalPayload) private {
+        uint256 proposalID = _createRadicleProposal(radProposalPayload);
+        _voteOnProposal(proposalID);
+        _skipVotingPeriod(proposalID);
+        _queueProposal(proposalID);
+        _skipQueuePeriod(proposalID);
+        _executeProposal(proposalID);
     }
 
     function testRadProposal1() public {
-        _createRadicleProposal();
-        _voteOnProposal();
-        _skipVotingPeriod();
-        _queueProposal();
-        _skipQueuePeriod();
-        _executeProposal();
+        _runRadicleGovProcess(address(radProposalPayload1));
     }
 }
