@@ -35,6 +35,8 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
     IRadicleToken public constant RADICLE_TOKEN = IRadicleToken(0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3);
 
     address public constant LLAMA_TREASURY = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
+    address public constant MOCK_RADICLE_PROPOSER = 0x464D78a5C97A2E2E9839C353ee9B6d4204c90B0b;
+    address public constant MOCK_GITCOIN_PROPOSER = 0x894Aa5F1E45454677A8560ddE3B45Cb5C427Ef92;
     // To be change-d later
     address public constant GTC_MULTISIG = 0x03C82B63B276c0D3050A49210c31036d3155e705;
     address public constant RAD_MULTISIG = 0x33e626727B9Ecf64E09f600A1E0f5adDe266a0DF;
@@ -67,6 +69,8 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         vm.label(address(RADICLE_GOVERNOR), "RADICLE_GOVERNOR");
         vm.label(address(RADICLE_TIMELOCK), "RADICLE_TIMELOCK");
         vm.label(address(RADICLE_TOKEN), "RADICLE_TOKEN");
+        vm.label(MOCK_RADICLE_PROPOSER, "MOCK_RADICLE_PROPOSER");
+        vm.label(MOCK_GITCOIN_PROPOSER, "MOCK_GITCOIN_PROPOSER");
         vm.label(LLAMA_TREASURY, "LLAMA_TREASURY");
         vm.label(GTC_MULTISIG, "GTC_MULTISIG");
         vm.label(RAD_MULTISIG, "RAD_MULTISIG");
@@ -79,6 +83,11 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
     //     string[] memory signatures;
     //     bytes[] memory calldatas;
 
-    //     targets
+    //     targets.push(address(radProposalPayload1));
+    //     values.push(0);
+    //     signatures.push("execute()");
+    //     calldatas.push(emptyBytes);
+
+    //     vm.prank(LLAMA_PROPOSER);
     // }
 }
