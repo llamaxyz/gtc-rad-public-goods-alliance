@@ -50,6 +50,10 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
     GtcProposalPayload public gtcProposalPayload;
     RadProposalPayload2 public radProposalPayload2;
 
+    uint256 radProposalId1;
+    uint256 radProposalId2;
+    uint256 gtcProposalId;
+
     function setUp() public {
         gtcRadGrant = new GtcRadGrant(GTC_AMOUNT, RAD_AMOUNT);
         vm.label(address(gtcRadGrant), "GtcRadGrant");
@@ -76,18 +80,23 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         vm.label(RAD_MULTISIG, "RAD_MULTISIG");
     }
 
-    // function _createRadicleProposal() public {
-    //     bytes memory emptyBytes;
-    //     address[] memory targets;
-    //     uint256[] memory values;
-    //     string[] memory signatures;
-    //     bytes[] memory calldatas;
+    function _createRadicleProposal() public {
+        address[] memory targets = new address[](1);
+        targets[0] = address(radProposalPayload1);
+        uint256[] memory values = new uint256[](1);
+        values[0] = uint256(0);
+        string[] memory signatures = new string[](1);
+        signatures[0] = "execute()";
+        bytes memory emptyBytes;
+        bytes[] memory calldatas = new bytes[](1);
+        calldatas[0] = emptyBytes;
+        string memory description = "gtcradswap";
 
-    //     targets.push(address(radProposalPayload1));
-    //     values.push(0);
-    //     signatures.push("execute()");
-    //     calldatas.push(emptyBytes);
+        vm.prank(MOCK_RADICLE_PROPOSER);
+        radProposalId1 = RADICLE_GOVERNOR.propose(targets, values, signatures, calldatas, description);
+    }
 
-    //     vm.prank(LLAMA_PROPOSER);
-    // }
+    function testCreateRadProposal() public {
+        _createRadicleProposal();
+    }
 }
