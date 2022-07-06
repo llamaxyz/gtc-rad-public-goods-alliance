@@ -102,30 +102,39 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         radProposalId1 = RADICLE_GOVERNOR.propose(targets, values, signatures, calldatas, description);
     }
 
-    function _skipVotingDelay(uint256 votingDelay) public {
-        vm.roll(block.number + votingDelay + 1);
-    }
-
     function _voteOnProposal() public {
+        (, , uint256 startBlock, , , , , ) = RADICLE_GOVERNOR.proposals(radProposalId1);
+        vm.roll(startBlock + 1);
         for (uint256 i; i < radWhales.length; i++) {
             vm.prank(radWhales[i]);
             RADICLE_GOVERNOR.castVote(radProposalId1, true);
         }
     }
 
-    function _skipVotingPeriod(uint256 votingPeriod) public {
-        vm.roll(block.number + votingPeriod);
+    function _skipVotingPeriod() public {
+        (, , , uint256 endBlock, , , , ) = RADICLE_GOVERNOR.proposals(radProposalId1);
+        vm.roll(endBlock + 1);
     }
 
     function _queueProposal() public {
         RADICLE_GOVERNOR.queue(radProposalId1);
     }
 
+    function _skipQueuePeriod() public {
+        (, uint256 eta, , , , , , ) = RADICLE_GOVERNOR.proposals(radProposalId1);
+        vm.warp(eta);
+    }
+
+    function _executeProposal() public {
+        RADICLE_GOVERNOR.execute(radProposalId1);
+    }
+
     function testRadProposal1() public {
         _createRadicleProposal();
-        _skipVotingDelay(RADICLE_GOVERNOR.votingDelay());
         _voteOnProposal();
-        _skipVotingPeriod(RADICLE_GOVERNOR.votingPeriod());
+        _skipVotingPeriod();
         _queueProposal();
+        _skipQueuePeriod();
+        _executeProposal();
     }
 }
