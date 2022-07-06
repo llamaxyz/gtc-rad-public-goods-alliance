@@ -54,6 +54,11 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
     uint256 radProposalId2;
     uint256 gtcProposalId;
 
+    address[] private radWhales = [
+        0xEA95cfB5Dd624F43775b372db0ED2D8d0073E91C,
+        0x464D78a5C97A2E2E9839C353ee9B6d4204c90B0b
+    ];
+
     function setUp() public {
         gtcRadGrant = new GtcRadGrant(GTC_AMOUNT, RAD_AMOUNT);
         vm.label(address(gtcRadGrant), "GtcRadGrant");
@@ -101,8 +106,10 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
     }
 
     function _voteOnProposal() public {
-        vm.prank(0xEA95cfB5Dd624F43775b372db0ED2D8d0073E91C);
-        RADICLE_GOVERNOR.castVote(radProposalId1, true);
+        for (uint256 i; i < radWhales.length; i++) {
+            vm.prank(radWhales[i]);
+            RADICLE_GOVERNOR.castVote(radProposalId1, true);
+        }
     }
 
     function testRadProposal1() public {
