@@ -86,7 +86,7 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
      *   Radicle Gov Process   *
      ***************************/
 
-    function _createRadicleProposal(address radProposalPayload) private returns (uint256 proposalID) {
+    function _radicleCreateProposal(address radProposalPayload) private returns (uint256 proposalID) {
         address[] memory targets = new address[](1);
         targets[0] = radProposalPayload;
         uint256[] memory values = new uint256[](1);
@@ -103,7 +103,7 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         proposalID = RADICLE_GOVERNOR.propose(targets, values, signatures, calldatas, description);
     }
 
-    function _voteOnProposal(uint256 proposalID) private {
+    function _radicleVoteOnProposal(uint256 proposalID) private {
         (, , uint256 startBlock, , , , , ) = RADICLE_GOVERNOR.proposals(proposalID);
         // Skipping Proposal delay of 1 block
         vm.roll(startBlock + 1);
@@ -114,36 +114,36 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         }
     }
 
-    function _skipVotingPeriod(uint256 proposalID) private {
+    function _radicleSkipVotingPeriod(uint256 proposalID) private {
         (, , , uint256 endBlock, , , , ) = RADICLE_GOVERNOR.proposals(proposalID);
         // Skipping Voting period of 3 days worth of blocks
         vm.roll(endBlock + 1);
     }
 
-    function _queueProposal(uint256 proposalID) private {
+    function _radicleQueueProposal(uint256 proposalID) private {
         RADICLE_GOVERNOR.queue(proposalID);
     }
 
-    function _skipQueuePeriod(uint256 proposalID) private {
+    function _radicleSkipQueuePeriod(uint256 proposalID) private {
         (, uint256 eta, , , , , , ) = RADICLE_GOVERNOR.proposals(proposalID);
         // Skipping Queue period of 2 days
         vm.warp(eta);
     }
 
-    function _executeProposal(uint256 proposalID) private {
+    function _radicleExecuteProposal(uint256 proposalID) private {
         RADICLE_GOVERNOR.execute(proposalID);
     }
 
-    function _runRadicleGovProcess(address radProposalPayload) private {
-        uint256 proposalID = _createRadicleProposal(radProposalPayload);
-        _voteOnProposal(proposalID);
-        _skipVotingPeriod(proposalID);
-        _queueProposal(proposalID);
-        _skipQueuePeriod(proposalID);
-        _executeProposal(proposalID);
+    function _radicleRunGovProcess(address radProposalPayload) private {
+        uint256 proposalID = _radicleCreateProposal(radProposalPayload);
+        _radicleVoteOnProposal(proposalID);
+        _radicleSkipVotingPeriod(proposalID);
+        _radicleQueueProposal(proposalID);
+        _radicleSkipQueuePeriod(proposalID);
+        _radicleExecuteProposal(proposalID);
     }
 
     function testRadProposal1() public {
-        _runRadicleGovProcess(address(radProposalPayload1));
+        _radicleRunGovProcess(address(radProposalPayload1));
     }
 }
