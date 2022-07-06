@@ -19,10 +19,10 @@ contract GtcProposalPayload {
     IGitcoinToken public constant GTC = IGitcoinToken(0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F);
     IRadicleToken public constant RAD = IRadicleToken(0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3);
 
-    GtcRadGrant public immutable GTC_RAD_GRANT;
-    address public immutable GTC_MULTISIG;
-    uint256 public immutable GTC_AMOUNT;
-    uint256 public immutable LLAMA_GTC_PAYMENT_AMOUNT;
+    GtcRadGrant public immutable gtcRadGrant;
+    address public immutable gtcMultisig;
+    uint256 public immutable gtcAmount;
+    uint256 public immutable llamaGtcPaymentAmount;
 
     /*******************
      *   CONSTRUCTOR   *
@@ -34,10 +34,10 @@ contract GtcProposalPayload {
         uint256 _gtcAmount,
         uint256 _llamaGtcPaymentAmount
     ) {
-        GTC_RAD_GRANT = _gtcRadGrant;
-        GTC_MULTISIG = _gtcMultisig;
-        GTC_AMOUNT = _gtcAmount;
-        LLAMA_GTC_PAYMENT_AMOUNT = _llamaGtcPaymentAmount;
+        gtcRadGrant = _gtcRadGrant;
+        gtcMultisig = _gtcMultisig;
+        gtcAmount = _gtcAmount;
+        llamaGtcPaymentAmount = _llamaGtcPaymentAmount;
     }
 
     /*****************
@@ -47,12 +47,12 @@ contract GtcProposalPayload {
     /// @notice The Gitcoin governance executor calls this function to implement the proposal
     function execute() external {
         // Approve the GTC <> RAD Public Goods Alliance grant contract to transfer pre-defined amount of GTC tokens
-        GTC.approve(address(GTC_RAD_GRANT), GTC_AMOUNT);
+        GTC.approve(address(gtcRadGrant), gtcAmount);
         // Execute the GTC <> RAD Public Goods Alliance grant
-        GTC_RAD_GRANT.grant();
+        gtcRadGrant.grant();
         // Delegate the received RAD tokens in GTC Treasury to the GTC Multisig
-        RAD.delegate(GTC_MULTISIG);
+        RAD.delegate(gtcMultisig);
         // Payment to Llama Treasury
-        GTC.transfer(LLAMA_TREASURY, LLAMA_GTC_PAYMENT_AMOUNT);
+        GTC.transfer(LLAMA_TREASURY, llamaGtcPaymentAmount);
     }
 }

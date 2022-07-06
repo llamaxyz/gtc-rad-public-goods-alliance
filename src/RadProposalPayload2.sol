@@ -15,16 +15,16 @@ contract RadProposalPayload2 {
 
     IGitcoinToken public constant GTC = IGitcoinToken(0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F);
 
-    address public immutable RAD_MULTISIG;
-    uint256 public immutable LLAMA_RAD_PAYMENT_AMOUNT;
+    address public immutable radMultisig;
+    uint256 public immutable llamaRadPaymentAmount;
 
     /*******************
      *   CONSTRUCTOR   *
      *******************/
 
     constructor(address _radMultisig, uint256 _llamaRadPaymentAmount) {
-        RAD_MULTISIG = _radMultisig;
-        LLAMA_RAD_PAYMENT_AMOUNT = _llamaRadPaymentAmount;
+        radMultisig = _radMultisig;
+        llamaRadPaymentAmount = _llamaRadPaymentAmount;
     }
 
     /*****************
@@ -34,8 +34,8 @@ contract RadProposalPayload2 {
     /// @notice The Radicle governance executor calls this function to implement the proposal
     function execute() external {
         // Delegate the received GTC tokens in RAD Treasury to the RAD Multisig
-        GTC.delegate(RAD_MULTISIG);
+        GTC.delegate(radMultisig);
         // Payment to Llama Treasury
-        GTC.transfer(LLAMA_TREASURY, LLAMA_RAD_PAYMENT_AMOUNT);
+        GTC.transfer(LLAMA_TREASURY, llamaRadPaymentAmount);
     }
 }

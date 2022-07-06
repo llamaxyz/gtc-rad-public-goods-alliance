@@ -15,16 +15,16 @@ contract RadProposalPayload1 {
 
     IRadicleToken public constant RAD = IRadicleToken(0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3);
 
-    GtcRadGrant public immutable GTC_RAD_GRANT;
-    uint256 public immutable RAD_AMOUNT;
+    GtcRadGrant public immutable gtcRadGrant;
+    uint256 public immutable radAmount;
 
     /*******************
      *   CONSTRUCTOR   *
      *******************/
 
     constructor(GtcRadGrant _gtcRadGrant, uint256 _radAmount) {
-        GTC_RAD_GRANT = _gtcRadGrant;
-        RAD_AMOUNT = _radAmount;
+        gtcRadGrant = _gtcRadGrant;
+        radAmount = _radAmount;
     }
 
     /*****************
@@ -34,6 +34,6 @@ contract RadProposalPayload1 {
     /// @notice The Radicle governance executor calls this function to implement the proposal
     function execute() external {
         // Approve the GTC <> RAD Public Goods Alliance grant contract to transfer pre-defined amount of RAD tokens
-        RAD.approve(address(GTC_RAD_GRANT), RAD_AMOUNT);
+        RAD.approve(address(gtcRadGrant), radAmount);
     }
 }
