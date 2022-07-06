@@ -60,6 +60,16 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
 
         radProposalPayload2 = new RadProposalPayload2(RAD_MULTISIG, LLAMA_RAD_PAYMENT_AMOUNT);
         vm.label(address(radProposalPayload2), "RadProposalPayload2");
+
+        vm.label(address(GITCOIN_GOVERNOR), "GITCOIN_GOVERNOR");
+        vm.label(address(GITCOIN_TIMELOCK), "GITCOIN_TIMELOCK");
+        vm.label(address(GITCOIN_TOKEN), "GITCOIN_TOKEN");
+        vm.label(address(RADICLE_GOVERNOR), "RADICLE_GOVERNOR");
+        vm.label(address(RADICLE_TIMELOCK), "RADICLE_TIMELOCK");
+        vm.label(address(RADICLE_TOKEN), "RADICLE_TOKEN");
+        vm.label(LLAMA_TREASURY, "LLAMA_TREASURY");
+        vm.label(GTC_MULTISIG, "GTC_MULTISIG");
+        vm.label(RAD_MULTISIG, "RAD_MULTISIG");
     }
 
     // function _createRadicleProposal() public {
