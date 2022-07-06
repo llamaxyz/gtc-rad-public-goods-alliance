@@ -24,7 +24,7 @@ import {RadProposalPayload2} from "../RadProposalPayload2.sol";
 contract GtcRadGrantTest is DSTestPlus, stdCheats {
     Vm private vm = Vm(HEVM_ADDRESS);
 
-    // CONSTANTS
+    // Constants
     IGitcoinGovernor public constant GITCOIN_GOVERNOR = IGitcoinGovernor(0xDbD27635A534A3d3169Ef0498beB56Fb9c937489);
     IGitcoinTimelock public constant GITCOIN_TIMELOCK =
         IGitcoinTimelock(payable(0x57a8865cfB1eCEf7253c27da6B4BC3dAEE5Be518));
@@ -45,14 +45,15 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
     uint256 public constant LLAMA_GTC_PAYMENT_AMOUNT = 6945e18;
     uint256 public constant LLAMA_RAD_PAYMENT_AMOUNT = 11765e18;
 
+    // Variables
     GtcRadGrant public gtcRadGrant;
     RadProposalPayload1 public radProposalPayload1;
     GtcProposalPayload public gtcProposalPayload;
     RadProposalPayload2 public radProposalPayload2;
 
-    uint256 radProposalId1;
-    uint256 radProposalId2;
-    uint256 gtcProposalId;
+    uint256 public radProposalId1;
+    uint256 public radProposalId2;
+    uint256 public gtcProposalId;
 
     address[] private radWhales = [
         0xEA95cfB5Dd624F43775b372db0ED2D8d0073E91C,
@@ -112,9 +113,19 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         }
     }
 
+    function _skipVotingPeriod(uint256 votingPeriod) public {
+        vm.roll(block.number + votingPeriod);
+    }
+
+    function _queueProposal() public {
+        RADICLE_GOVERNOR.queue(radProposalId1);
+    }
+
     function testRadProposal1() public {
         _createRadicleProposal();
         _skipVotingDelay(RADICLE_GOVERNOR.votingDelay());
         _voteOnProposal();
+        _skipVotingPeriod(RADICLE_GOVERNOR.votingPeriod());
+        _queueProposal();
     }
 }
