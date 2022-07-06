@@ -96,7 +96,18 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         radProposalId1 = RADICLE_GOVERNOR.propose(targets, values, signatures, calldatas, description);
     }
 
-    function testCreateRadProposal() public {
+    function _skipVotingDelay(uint256 votingDelay) public {
+        vm.roll(block.number + votingDelay + 1);
+    }
+
+    function _voteOnProposal() public {
+        vm.prank(0xEA95cfB5Dd624F43775b372db0ED2D8d0073E91C);
+        RADICLE_GOVERNOR.castVote(radProposalId1, true);
+    }
+
+    function testRadProposal1() public {
         _createRadicleProposal();
+        _skipVotingDelay(RADICLE_GOVERNOR.votingDelay());
+        _voteOnProposal();
     }
 }
