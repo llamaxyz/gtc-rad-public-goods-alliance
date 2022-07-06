@@ -126,6 +126,7 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
 
     function _skipQueuePeriod(uint256 proposalID) private {
         (, uint256 eta, , , , , , ) = RADICLE_GOVERNOR.proposals(proposalID);
+        // Skipping Queue period of 2 days
         vm.warp(eta);
     }
 
