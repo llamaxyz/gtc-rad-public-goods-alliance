@@ -56,6 +56,11 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         0x464D78a5C97A2E2E9839C353ee9B6d4204c90B0b
     ];
 
+    address[] private gtcWhales = [
+        0xc2E2B715d9e302947Ec7e312fd2384b5a1296099,
+        0x34aA3F359A9D614239015126635CE7732c18fDF3
+    ];
+
     function setUp() public {
         gtcRadGrant = new GtcRadGrant(GTC_AMOUNT, RAD_AMOUNT);
         vm.label(address(gtcRadGrant), "GtcRadGrant");
@@ -86,9 +91,9 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
      *   Radicle Gov Process   *
      ***************************/
 
-    function _radicleCreateProposal(address radProposalPayload) private returns (uint256 proposalID) {
+    function _radicleCreateProposal(address proposalPayload) private returns (uint256 proposalID) {
         address[] memory targets = new address[](1);
-        targets[0] = radProposalPayload;
+        targets[0] = proposalPayload;
         uint256[] memory values = new uint256[](1);
         values[0] = uint256(0);
         string[] memory signatures = new string[](1);
@@ -134,8 +139,8 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         RADICLE_GOVERNOR.execute(proposalID);
     }
 
-    function _radicleRunGovProcess(address radProposalPayload) private {
-        uint256 proposalID = _radicleCreateProposal(radProposalPayload);
+    function _radicleRunGovProcess(address proposalPayload) private {
+        uint256 proposalID = _radicleCreateProposal(proposalPayload);
         _radicleVoteOnProposal(proposalID);
         _radicleSkipVotingPeriod(proposalID);
         _radicleQueueProposal(proposalID);
@@ -145,5 +150,71 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
 
     function testRadProposal1() public {
         _radicleRunGovProcess(address(radProposalPayload1));
+        // assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), RAD_AMOUNT);
+    }
+
+    /***************************
+     *   Gitcoin Gov Process   *
+     ***************************/
+
+    function _gitcoinCreateProposal(address proposalPayload) private returns (uint256 proposalID) {
+        address[] memory targets = new address[](1);
+        targets[0] = proposalPayload;
+        uint256[] memory values = new uint256[](1);
+        values[0] = uint256(0);
+        string[] memory signatures = new string[](1);
+        signatures[0] = "execute()";
+        bytes memory emptyBytes;
+        bytes[] memory calldatas = new bytes[](1);
+        calldatas[0] = emptyBytes;
+        string memory description = "GTC <> RAD Public Goods Alliance";
+
+        // Proposer that has > 1M GTC votes
+        vm.prank(MOCK_GITCOIN_PROPOSER);
+        proposalID = GITCOIN_GOVERNOR.propose(targets, values, signatures, calldatas, description);
+    }
+
+    function _gitcoinVoteOnProposal(uint256 proposalID) private {
+        (, , , uint256 startBlock, , , , , ) = GITCOIN_GOVERNOR.proposals(proposalID);
+        // Skipping Proposal delay of 2 days worth of blocks
+        vm.roll(startBlock + 1);
+        // Hitting quorum of > 2.5M GTC votes
+        for (uint256 i; i < gtcWhales.length; i++) {
+            vm.prank(gtcWhales[i]);
+            GITCOIN_GOVERNOR.castVote(proposalID, true);
+        }
+    }
+
+    function _gitcoinSkipVotingPeriod(uint256 proposalID) private {
+        (, , , , uint256 endBlock, , , , ) = GITCOIN_GOVERNOR.proposals(proposalID);
+        // Skipping Voting period of 7 days worth of blocks
+        vm.roll(endBlock + 1);
+    }
+
+    function _gitcoinQueueProposal(uint256 proposalID) private {
+        GITCOIN_GOVERNOR.queue(proposalID);
+    }
+
+    function _gitcoinSkipQueuePeriod(uint256 proposalID) private {
+        (, , uint256 eta, , , , , , ) = GITCOIN_GOVERNOR.proposals(proposalID);
+        // Skipping Queue period of 2 days
+        vm.warp(eta);
+    }
+
+    function _gitcoinExecuteProposal(uint256 proposalID) private {
+        GITCOIN_GOVERNOR.execute(proposalID);
+    }
+
+    function _gitcoinRunGovProcess(address proposalPayload) private {
+        uint256 proposalID = _gitcoinCreateProposal(proposalPayload);
+        _gitcoinVoteOnProposal(proposalID);
+        _gitcoinSkipVotingPeriod(proposalID);
+        _gitcoinQueueProposal(proposalID);
+        _gitcoinSkipQueuePeriod(proposalID);
+        //_gitcoinExecuteProposal(proposalID);
+    }
+
+    function testGtcProposal() public {
+        _gitcoinRunGovProcess(address(gtcProposalPayload));
     }
 }
