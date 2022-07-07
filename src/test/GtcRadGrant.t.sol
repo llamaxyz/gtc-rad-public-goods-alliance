@@ -81,6 +81,11 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
 
     function testRadicleProposal1() public {
         // Approve the GTC <> RAD Public Goods Alliance grant contract to transfer pre-defined amount of RAD tokens
+        _runRadicleProposal1();
+        assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), RAD_AMOUNT);
+    }
+
+    function _runRadicleProposal1() private {
         address[] memory targets = new address[](1);
         targets[0] = address(RADICLE_TOKEN);
         uint256[] memory values = new uint256[](1);
@@ -90,9 +95,8 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         bytes[] memory calldatas = new bytes[](1);
         calldatas[0] = abi.encode(address(gtcRadGrant), RAD_AMOUNT);
 
-        uint256 proposalID = _radicleCreateProposal(targets, values, signatures, calldatas);
+        uint256 proposalID = _radicleCreateProposal(targets, values, signatures, calldatas, DESCRIPTION);
         _radicleRunGovProcess(proposalID);
-        assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), RAD_AMOUNT);
     }
 
     // function testGitcoinProposal() public {
@@ -105,9 +109,8 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
     //     bytes memory emptyBytes;
     //     bytes[] memory calldatas = new bytes[](1);
     //     calldatas[0] = emptyBytes;
-    //     string memory description = "GTC <> RAD Public Goods Alliance";
 
-    //     uint256 proposalID = _gitcoinCreateProposal(targets, values, signatures, calldatas);
+    //     uint256 proposalID = _gitcoinCreateProposal(targets, values, signatures, calldatas, DESCRIPTION);
     //     _gitcoinRunGovProcess(proposalID);
     // }
 
@@ -119,11 +122,12 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         address[] memory targets,
         uint256[] memory values,
         string[] memory signatures,
-        bytes[] memory calldatas
+        bytes[] memory calldatas,
+        string memory description
     ) private returns (uint256 proposalID) {
         // Proposer that has > 1M RAD votes
         vm.prank(MOCK_RADICLE_PROPOSER);
-        proposalID = RADICLE_GOVERNOR.propose(targets, values, signatures, calldatas, DESCRIPTION);
+        proposalID = RADICLE_GOVERNOR.propose(targets, values, signatures, calldatas, description);
     }
 
     function _radicleVoteOnProposal(uint256 proposalID) private {
@@ -173,11 +177,12 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         address[] memory targets,
         uint256[] memory values,
         string[] memory signatures,
-        bytes[] memory calldatas
+        bytes[] memory calldatas,
+        string memory description
     ) private returns (uint256 proposalID) {
         // Proposer that has > 1M GTC votes
         vm.prank(MOCK_GITCOIN_PROPOSER);
-        proposalID = GITCOIN_GOVERNOR.propose(targets, values, signatures, calldatas, DESCRIPTION);
+        proposalID = GITCOIN_GOVERNOR.propose(targets, values, signatures, calldatas, description);
     }
 
     function _gitcoinVoteOnProposal(uint256 proposalID) private {
