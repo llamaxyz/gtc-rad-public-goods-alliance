@@ -217,6 +217,14 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         _radicleRunGovProcess(proposalID);
     }
 
+    function testSecondGrantCall() public {
+        _runRadicleProposal1();
+        _runGitcoinProposal();
+
+        vm.expectRevert(GtcRadGrant.GrantAlreadyOccured.selector);
+        gtcRadGrant.grant();
+    }
+
     /***************************
      *   Radicle Gov Process   *
      ***************************/
