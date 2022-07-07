@@ -80,19 +80,20 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
      ******************/
 
     function testRadicleProposal1() public {
-        // Approve the GTC <> RAD Public Goods Alliance grant contract to transfer pre-defined amount of RAD tokens
         _runRadicleProposal1();
         assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), RAD_AMOUNT);
     }
 
     function _runRadicleProposal1() private {
         address[] memory targets = new address[](1);
-        targets[0] = address(RADICLE_TOKEN);
         uint256[] memory values = new uint256[](1);
-        values[0] = uint256(0);
         string[] memory signatures = new string[](1);
-        signatures[0] = "approve(address,uint256)";
         bytes[] memory calldatas = new bytes[](1);
+
+        // Approve the GTC <> RAD Public Goods Alliance grant contract to transfer pre-defined amount of RAD tokens
+        targets[0] = address(RADICLE_TOKEN);
+        values[0] = uint256(0);
+        signatures[0] = "approve(address,uint256)";
         calldatas[0] = abi.encode(address(gtcRadGrant), RAD_AMOUNT);
 
         uint256 proposalID = _radicleCreateProposal(targets, values, signatures, calldatas, DESCRIPTION);
@@ -100,14 +101,15 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
     }
 
     // function testGitcoinProposal() public {
-    //     address[] memory targets = new address[](1);
+    //     address[] memory targets = new address[](4);
+    //     uint256[] memory values = new uint256[](4);
+    //     string[] memory signatures = new string[](4);
+    //     bytes[] memory calldatas = new bytes[](4);
+
+    //     // Approve the GTC <> RAD Public Goods Alliance grant contract to transfer pre-defined amount of GTC tokens
     //     targets[0] = proposalPayload;
-    //     uint256[] memory values = new uint256[](1);
     //     values[0] = uint256(0);
-    //     string[] memory signatures = new string[](1);
     //     signatures[0] = "execute()";
-    //     bytes memory emptyBytes;
-    //     bytes[] memory calldatas = new bytes[](1);
     //     calldatas[0] = emptyBytes;
 
     //     uint256 proposalID = _gitcoinCreateProposal(targets, values, signatures, calldatas, DESCRIPTION);
