@@ -130,6 +130,8 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
             initialLlamaTreasuryGitcoinBalance + LLAMA_GTC_PAYMENT_AMOUNT,
             GITCOIN_TOKEN.balanceOf(LLAMA_TREASURY)
         );
+        // Checking that RAD tokens of Gitcoin treasury has been delegated to Gitcoin Multisig
+        assertEq(RADICLE_TOKEN.delegates(address(GITCOIN_TIMELOCK)), GTC_MULTISIG);
     }
 
     function _runGitcoinProposal() private {
