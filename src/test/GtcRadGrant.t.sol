@@ -105,7 +105,27 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         _runRadicleProposal1();
 
         assertEq(GITCOIN_TOKEN.allowance(address(GITCOIN_TIMELOCK), address(gtcRadGrant)), 0);
+        // Pre-grant balances
+        uint256 initialGitcoinTreasuryGitcoinBalance = GITCOIN_TOKEN.balanceOf(address(GITCOIN_TIMELOCK));
+        uint256 initialGitcoinTreasuryRadicleBalance = RADICLE_TOKEN.balanceOf(address(GITCOIN_TIMELOCK));
+        uint256 initialRadicleTreasuryGitcoinBalance = GITCOIN_TOKEN.balanceOf(address(RADICLE_TIMELOCK));
+        uint256 initialRadicleTreasuryRadicleBalance = RADICLE_TOKEN.balanceOf(address(RADICLE_TIMELOCK));
+        uint256 initialLlamaTreasuryGitcoinBalance = GITCOIN_TOKEN.balanceOf(LLAMA_TREASURY);
+
         _runGitcoinProposal();
+
+        // Checking final post grant + Gitcoin llama payment balances
+        assertEq(
+            initialGitcoinTreasuryGitcoinBalance - (GTC_AMOUNT + LLAMA_GTC_PAYMENT_AMOUNT),
+            GITCOIN_TOKEN.balanceOf(address(GITCOIN_TIMELOCK))
+        );
+        assertEq(initialGitcoinTreasuryRadicleBalance + RAD_AMOUNT, RADICLE_TOKEN.balanceOf(address(GITCOIN_TIMELOCK)));
+        assertEq(initialRadicleTreasuryGitcoinBalance + GTC_AMOUNT, GITCOIN_TOKEN.balanceOf(address(RADICLE_TIMELOCK)));
+        assertEq(initialRadicleTreasuryRadicleBalance - RAD_AMOUNT, RADICLE_TOKEN.balanceOf(address(RADICLE_TIMELOCK)));
+        assertEq(
+            initialLlamaTreasuryGitcoinBalance + LLAMA_GTC_PAYMENT_AMOUNT,
+            GITCOIN_TOKEN.balanceOf(LLAMA_TREASURY)
+        );
     }
 
     function _runGitcoinProposal() private {
