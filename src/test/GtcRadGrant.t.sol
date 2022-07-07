@@ -173,9 +173,10 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         _runRadicleProposal1();
         _runGitcoinProposal();
 
-        // assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), 0);
         _runRadicleProposal2();
-        // assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), RAD_AMOUNT);
+
+        // Checking that GTC tokens of Radicle treasury has been delegated to Radicle Multisig
+        assertEq(GITCOIN_TOKEN.delegates(address(RADICLE_TIMELOCK)), RAD_MULTISIG);
     }
 
     function _runRadicleProposal2() private {
