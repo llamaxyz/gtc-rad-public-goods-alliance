@@ -100,21 +100,46 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         _radicleRunGovProcess(proposalID);
     }
 
-    // function testGitcoinProposal() public {
-    //     address[] memory targets = new address[](4);
-    //     uint256[] memory values = new uint256[](4);
-    //     string[] memory signatures = new string[](4);
-    //     bytes[] memory calldatas = new bytes[](4);
+    function testGitcoinProposal() public {
+        _runRadicleProposal1();
 
-    //     // Approve the GTC <> RAD Public Goods Alliance grant contract to transfer pre-defined amount of GTC tokens
-    //     targets[0] = proposalPayload;
-    //     values[0] = uint256(0);
-    //     signatures[0] = "execute()";
-    //     calldatas[0] = emptyBytes;
+        _runGitcoinProposal();
+    }
 
-    //     uint256 proposalID = _gitcoinCreateProposal(targets, values, signatures, calldatas, DESCRIPTION);
-    //     _gitcoinRunGovProcess(proposalID);
-    // }
+    function _runGitcoinProposal() private {
+        address[] memory targets = new address[](4);
+        uint256[] memory values = new uint256[](4);
+        string[] memory signatures = new string[](4);
+        bytes[] memory calldatas = new bytes[](4);
+
+        // Approve the GTC <> RAD Public Goods Alliance grant contract to transfer pre-defined amount of GTC tokens
+        targets[0] = address(GITCOIN_TOKEN);
+        values[0] = uint256(0);
+        signatures[0] = "approve(address,uint256)";
+        calldatas[0] = abi.encode(address(gtcRadGrant), GTC_AMOUNT);
+
+        // Execute the GTC <> RAD Public Goods Alliance grant
+        targets[1] = address(gtcRadGrant);
+        values[1] = uint256(0);
+        signatures[1] = "grant()";
+        bytes memory emptyBytes;
+        calldatas[1] = emptyBytes;
+
+        // Delegate the received RAD tokens in GTC Treasury to the GTC Multisig
+        targets[2] = address(RADICLE_TOKEN);
+        values[2] = uint256(0);
+        signatures[2] = "delegate(address)";
+        calldatas[2] = abi.encode(GTC_MULTISIG);
+
+        // Payment to Llama Treasury
+        targets[3] = address(GITCOIN_TOKEN);
+        values[3] = uint256(0);
+        signatures[3] = "transfer(address,uint256)";
+        calldatas[3] = abi.encode(LLAMA_TREASURY, LLAMA_GTC_PAYMENT_AMOUNT);
+
+        uint256 proposalID = _gitcoinCreateProposal(targets, values, signatures, calldatas, DESCRIPTION);
+        _gitcoinRunGovProcess(proposalID);
+    }
 
     /***************************
      *   Radicle Gov Process   *
