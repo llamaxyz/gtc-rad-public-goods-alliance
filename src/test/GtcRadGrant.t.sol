@@ -173,8 +173,21 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         _runRadicleProposal1();
         _runGitcoinProposal();
 
+        // Pre llama payment balances
+        uint256 initialRadicleTreasuryRadicleBalance = RADICLE_TOKEN.balanceOf(address(RADICLE_TIMELOCK));
+        uint256 initialLlamaTreasuryRadicleBalance = RADICLE_TOKEN.balanceOf(LLAMA_TREASURY);
+
         _runRadicleProposal2();
 
+        // Checking final post llama payment balances
+        assertEq(
+            initialRadicleTreasuryRadicleBalance - LLAMA_RAD_PAYMENT_AMOUNT,
+            RADICLE_TOKEN.balanceOf(address(RADICLE_TIMELOCK))
+        );
+        assertEq(
+            initialLlamaTreasuryRadicleBalance + LLAMA_RAD_PAYMENT_AMOUNT,
+            RADICLE_TOKEN.balanceOf(LLAMA_TREASURY)
+        );
         // Checking that GTC tokens of Radicle treasury has been delegated to Radicle Multisig
         assertEq(GITCOIN_TOKEN.delegates(address(RADICLE_TIMELOCK)), RAD_MULTISIG);
     }
