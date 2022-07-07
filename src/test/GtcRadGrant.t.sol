@@ -80,6 +80,7 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
      ******************/
 
     function testRadicleProposal1() public {
+        // Approve the GTC <> RAD Public Goods Alliance grant contract to transfer pre-defined amount of RAD tokens
         address[] memory targets = new address[](1);
         targets[0] = address(RADICLE_TOKEN);
         uint256[] memory values = new uint256[](1);
