@@ -80,6 +80,7 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
      ******************/
 
     function testRadicleProposal1() public {
+        assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), 0);
         _runRadicleProposal1();
         assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), RAD_AMOUNT);
     }
@@ -103,6 +104,7 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
     function testGitcoinProposal() public {
         _runRadicleProposal1();
 
+        assertEq(GITCOIN_TOKEN.allowance(address(GITCOIN_TIMELOCK), address(gtcRadGrant)), 0);
         _runGitcoinProposal();
     }
 
