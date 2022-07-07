@@ -159,7 +159,7 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         signatures[2] = "delegate(address)";
         calldatas[2] = abi.encode(GTC_MULTISIG);
 
-        // Payment to Llama Treasury
+        // Payment to Llama Treasury in GTC tokens
         targets[3] = address(GITCOIN_TOKEN);
         values[3] = uint256(0);
         signatures[3] = "transfer(address,uint256)";
@@ -167,6 +167,37 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
 
         uint256 proposalID = _gitcoinCreateProposal(targets, values, signatures, calldatas, DESCRIPTION);
         _gitcoinRunGovProcess(proposalID);
+    }
+
+    function testRadicleProposal2() public {
+        _runRadicleProposal1();
+        _runGitcoinProposal();
+
+        // assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), 0);
+        _runRadicleProposal2();
+        // assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), RAD_AMOUNT);
+    }
+
+    function _runRadicleProposal2() private {
+        address[] memory targets = new address[](2);
+        uint256[] memory values = new uint256[](2);
+        string[] memory signatures = new string[](2);
+        bytes[] memory calldatas = new bytes[](2);
+
+        // Delegate the received GTC tokens in RAD Treasury to the RAD Multisig
+        targets[0] = address(GITCOIN_TOKEN);
+        values[0] = uint256(0);
+        signatures[0] = "delegate(address)";
+        calldatas[0] = abi.encode(RAD_MULTISIG);
+
+        // Payment to Llama Treasury in RAD tokens
+        targets[1] = address(RADICLE_TOKEN);
+        values[1] = uint256(0);
+        signatures[1] = "transfer(address,uint256)";
+        calldatas[1] = abi.encode(LLAMA_TREASURY, LLAMA_RAD_PAYMENT_AMOUNT);
+
+        uint256 proposalID = _radicleCreateProposal(targets, values, signatures, calldatas, DESCRIPTION);
+        _radicleRunGovProcess(proposalID);
     }
 
     /***************************
