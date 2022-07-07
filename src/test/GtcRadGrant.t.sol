@@ -83,7 +83,9 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
 
     function testRadicleProposal1() public {
         assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), 0);
+
         _runRadicleProposal1();
+
         assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), RAD_AMOUNT);
     }
 
@@ -116,6 +118,7 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
 
         vm.expectEmit(true, true, false, true);
         emit Grant(address(GITCOIN_TIMELOCK), address(RADICLE_TIMELOCK), GTC_AMOUNT, RAD_AMOUNT);
+
         _runGitcoinProposal();
 
         // Checking final post grant + Gitcoin llama payment balances
