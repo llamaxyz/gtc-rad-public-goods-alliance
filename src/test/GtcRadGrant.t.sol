@@ -19,6 +19,8 @@ import {IRadicleToken} from "../external/IRadicleToken.sol";
 import {GtcRadGrant} from "../GtcRadGrant.sol";
 
 contract GtcRadGrantTest is DSTestPlus, stdCheats {
+    event Grant(address indexed gtcTreasury, address indexed radTreasury, uint256 gtcAmount, uint256 radAmount);
+
     Vm private vm = Vm(HEVM_ADDRESS);
 
     IGitcoinGovernor public constant GITCOIN_GOVERNOR = IGitcoinGovernor(0xDbD27635A534A3d3169Ef0498beB56Fb9c937489);
@@ -112,6 +114,8 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         uint256 initialRadicleTreasuryRadicleBalance = RADICLE_TOKEN.balanceOf(address(RADICLE_TIMELOCK));
         uint256 initialLlamaTreasuryGitcoinBalance = GITCOIN_TOKEN.balanceOf(LLAMA_TREASURY);
 
+        vm.expectEmit(true, true, false, true);
+        emit Grant(address(GITCOIN_TIMELOCK), address(RADICLE_TIMELOCK), GTC_AMOUNT, RAD_AMOUNT);
         _runGitcoinProposal();
 
         // Checking final post grant + Gitcoin llama payment balances
