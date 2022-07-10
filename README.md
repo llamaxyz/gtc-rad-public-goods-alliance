@@ -1,6 +1,32 @@
 # Gitcoin <> Radicle Public Goods Alliance
 
-This repository contains the swap contract and respective proposal payloads for Gitcoin and Radicle Governance.
+This repository contains the swap contract and the test cases for exectuing the Public Goods alliance on Gitcoin and Radicle Governance.
+
+## Public Goods Alliance Implementation
+
+The full implementation of this Public Goods Alliance involves deploying the `GtcRadGrant` contract and 2 Proposals on Radicle's governance and 1 Proposal on Gitcoin's governance to be executed in the following order:
+
+### Deploy GtcRadGrant contract
+
+- Deploy the GtcRadGrant contract.
+
+### Radicle Proposal 1
+
+- Call `approve(address,uint256)` on the Radicle token contract (`0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3`) with calldata of the address of the deployed GtcRadGrant contract and amount of RAD tokens to be approved.
+
+### Gitcoin Proposal
+
+- Call `approve(address,uint256)` on the Gitcoin token contract (`0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F`) with calldata of the address of the deployed GtcRadGrant contract and amount of GTC tokens to be approved (`500,000 GTC`)
+
+- Call `grant()` on the deployed GtcRadGrant contract.
+
+- Call `delegate(address)` on the Radicle token contract (`0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3`) with calldata of the Gitcoin Multisig address (`0xBD8d617Ac53c5Efc5fBDBb51d445f7A2350D4940`).
+
+### Radicle Proposal 2
+
+- Call `delegate(address)` on the Gitcoin token contract (`0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F`) with call data of the Radicle Multisig address (`0x93F80a67FdFDF9DaF1aee5276Db95c8761cc8561`).
+
+- Call `transfer(address,uint256)` on the Radicle token contract (`0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3`) with calldata of the Llama Treasury address (`0xA519a7cE7B24333055781133B13532AEabfAC81b`) and the Llama Payment amount in RAD tokens.
 
 ## Installation
 

@@ -44,7 +44,6 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
     // To be change-d later
     uint256 public constant GTC_AMOUNT = 500000e18;
     uint256 public constant RAD_AMOUNT = 885990e18;
-    uint256 public constant LLAMA_GTC_PAYMENT_AMOUNT = 6945e18;
     uint256 public constant LLAMA_RAD_PAYMENT_AMOUNT = 11765e18;
     // To be change-d later
 
@@ -114,7 +113,6 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         uint256 initialGitcoinTreasuryRadicleBalance = RADICLE_TOKEN.balanceOf(address(GITCOIN_TIMELOCK));
         uint256 initialRadicleTreasuryGitcoinBalance = GITCOIN_TOKEN.balanceOf(address(RADICLE_TIMELOCK));
         uint256 initialRadicleTreasuryRadicleBalance = RADICLE_TOKEN.balanceOf(address(RADICLE_TIMELOCK));
-        uint256 initialLlamaTreasuryGitcoinBalance = GITCOIN_TOKEN.balanceOf(LLAMA_TREASURY);
 
         vm.expectEmit(true, true, false, true);
         emit Grant(address(GITCOIN_TIMELOCK), address(RADICLE_TIMELOCK), GTC_AMOUNT, RAD_AMOUNT);
@@ -122,26 +120,19 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         _runGitcoinProposal();
 
         // Checking final post grant + Gitcoin llama payment balances
-        assertEq(
-            initialGitcoinTreasuryGitcoinBalance - (GTC_AMOUNT + LLAMA_GTC_PAYMENT_AMOUNT),
-            GITCOIN_TOKEN.balanceOf(address(GITCOIN_TIMELOCK))
-        );
+        assertEq(initialGitcoinTreasuryGitcoinBalance - GTC_AMOUNT, GITCOIN_TOKEN.balanceOf(address(GITCOIN_TIMELOCK)));
         assertEq(initialGitcoinTreasuryRadicleBalance + RAD_AMOUNT, RADICLE_TOKEN.balanceOf(address(GITCOIN_TIMELOCK)));
         assertEq(initialRadicleTreasuryGitcoinBalance + GTC_AMOUNT, GITCOIN_TOKEN.balanceOf(address(RADICLE_TIMELOCK)));
         assertEq(initialRadicleTreasuryRadicleBalance - RAD_AMOUNT, RADICLE_TOKEN.balanceOf(address(RADICLE_TIMELOCK)));
-        assertEq(
-            initialLlamaTreasuryGitcoinBalance + LLAMA_GTC_PAYMENT_AMOUNT,
-            GITCOIN_TOKEN.balanceOf(LLAMA_TREASURY)
-        );
         // Checking that RAD tokens of Gitcoin treasury has been delegated to Gitcoin Multisig
         assertEq(RADICLE_TOKEN.delegates(address(GITCOIN_TIMELOCK)), GTC_MULTISIG);
     }
 
     function _runGitcoinProposal() private {
-        address[] memory targets = new address[](4);
-        uint256[] memory values = new uint256[](4);
-        string[] memory signatures = new string[](4);
-        bytes[] memory calldatas = new bytes[](4);
+        address[] memory targets = new address[](3);
+        uint256[] memory values = new uint256[](3);
+        string[] memory signatures = new string[](3);
+        bytes[] memory calldatas = new bytes[](3);
 
         // Approve the GTC <> RAD Public Goods Alliance grant contract to transfer pre-defined amount of GTC tokens
         targets[0] = address(GITCOIN_TOKEN);
@@ -161,12 +152,6 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         values[2] = uint256(0);
         signatures[2] = "delegate(address)";
         calldatas[2] = abi.encode(GTC_MULTISIG);
-
-        // Payment to Llama Treasury in GTC tokens
-        targets[3] = address(GITCOIN_TOKEN);
-        values[3] = uint256(0);
-        signatures[3] = "transfer(address,uint256)";
-        calldatas[3] = abi.encode(LLAMA_TREASURY, LLAMA_GTC_PAYMENT_AMOUNT);
 
         uint256 proposalID = _gitcoinCreateProposal(targets, values, signatures, calldatas, DESCRIPTION);
         _gitcoinRunGovProcess(proposalID);
