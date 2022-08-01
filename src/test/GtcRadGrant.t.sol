@@ -86,14 +86,24 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
      ******************/
 
     function testRadicleProposal() public {
+        // Checking allowance of grant contract from Radicle Timelock is 0
         assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), 0);
+        // Checking that GTC Voting power of Radicle Timelock and Radicle Multisig are 0
+        assertEq(uint256(GITCOIN_TOKEN.getCurrentVotes(address(RADICLE_TIMELOCK))), 0);
+        assertEq(uint256(GITCOIN_TOKEN.getCurrentVotes(RAD_MULTISIG)), 0);
         // Pre llama payment balances
         uint256 initialRadicleTreasuryRadicleBalance = RADICLE_TOKEN.balanceOf(address(RADICLE_TIMELOCK));
         uint256 initialLlamaTreasuryRadicleBalance = RADICLE_TOKEN.balanceOf(LLAMA_TREASURY);
 
         _runRadicleProposal();
 
+        // Checking allowance of grant contract from Radicle Timelock is RAD_AMOUNT
         assertEq(RADICLE_TOKEN.allowance(address(RADICLE_TIMELOCK), address(gtcRadGrant)), RAD_AMOUNT);
+        // Checking that GTC tokens of Radicle treasury has been delegated to Radicle Multisig
+        assertEq(GITCOIN_TOKEN.delegates(address(RADICLE_TIMELOCK)), RAD_MULTISIG);
+        // Checking that GTC Voting power of Radicle Timelock and Radicle Multisig are still 0
+        assertEq(uint256(GITCOIN_TOKEN.getCurrentVotes(address(RADICLE_TIMELOCK))), 0);
+        assertEq(uint256(GITCOIN_TOKEN.getCurrentVotes(RAD_MULTISIG)), 0);
         // Checking final post llama payment balances
         assertEq(
             initialRadicleTreasuryRadicleBalance - LLAMA_RAD_PAYMENT_AMOUNT,
@@ -103,8 +113,6 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
             initialLlamaTreasuryRadicleBalance + LLAMA_RAD_PAYMENT_AMOUNT,
             RADICLE_TOKEN.balanceOf(LLAMA_TREASURY)
         );
-        // Checking that GTC tokens of Radicle treasury has been delegated to Radicle Multisig
-        assertEq(GITCOIN_TOKEN.delegates(address(RADICLE_TIMELOCK)), RAD_MULTISIG);
     }
 
     function _runRadicleProposal() private {
@@ -138,12 +146,16 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
     function testGitcoinProposal() public {
         _runRadicleProposal();
 
+        // Checking allowance of grant contract from Gitcoin Timelock is 0
         assertEq(GITCOIN_TOKEN.allowance(address(GITCOIN_TIMELOCK), address(gtcRadGrant)), 0);
         // Pre-grant balances
         uint256 initialGitcoinTreasuryGitcoinBalance = GITCOIN_TOKEN.balanceOf(address(GITCOIN_TIMELOCK));
         uint256 initialGitcoinTreasuryRadicleBalance = RADICLE_TOKEN.balanceOf(address(GITCOIN_TIMELOCK));
         uint256 initialRadicleTreasuryGitcoinBalance = GITCOIN_TOKEN.balanceOf(address(RADICLE_TIMELOCK));
         uint256 initialRadicleTreasuryRadicleBalance = RADICLE_TOKEN.balanceOf(address(RADICLE_TIMELOCK));
+        // Checking that RAD Voting power of Gitcoin Timelock and Gitcoin Multisig are 0
+        assertEq(uint256(RADICLE_TOKEN.getCurrentVotes(address(GITCOIN_TIMELOCK))), 0);
+        assertEq(uint256(RADICLE_TOKEN.getCurrentVotes(GTC_MULTISIG)), 0);
 
         vm.expectEmit(true, true, false, true);
         emit Grant(address(GITCOIN_TIMELOCK), address(RADICLE_TIMELOCK), GTC_AMOUNT, RAD_AMOUNT);
@@ -157,6 +169,12 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
         assertEq(initialRadicleTreasuryRadicleBalance - RAD_AMOUNT, RADICLE_TOKEN.balanceOf(address(RADICLE_TIMELOCK)));
         // Checking that RAD tokens of Gitcoin treasury has been delegated to Gitcoin Multisig
         assertEq(RADICLE_TOKEN.delegates(address(GITCOIN_TIMELOCK)), GTC_MULTISIG);
+        // Checking that RAD Voting power of Gitcoin Timelock is 0 and GTC Multisig is RAD.balanceOf(GITCOIN_TIMELOCK)
+        assertEq(uint256(RADICLE_TOKEN.getCurrentVotes(address(GITCOIN_TIMELOCK))), 0);
+        assertEq(
+            uint256(RADICLE_TOKEN.getCurrentVotes(GTC_MULTISIG)),
+            RADICLE_TOKEN.balanceOf(address(GITCOIN_TIMELOCK))
+        );
     }
 
     function _runGitcoinProposal() private {
@@ -186,6 +204,24 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
 
         uint256 proposalID = _gitcoinCreateProposal(targets, values, signatures, calldatas, DESCRIPTION);
         _gitcoinRunGovProcess(proposalID);
+    }
+
+    function testRadicleGTCDelegation() public {
+        // Checking that GTC Voting power of Radicle Timelock and Radicle Multisig are 0
+        assertEq(uint256(GITCOIN_TOKEN.getCurrentVotes(address(RADICLE_TIMELOCK))), 0);
+        assertEq(uint256(GITCOIN_TOKEN.getCurrentVotes(RAD_MULTISIG)), 0);
+
+        _runRadicleProposal();
+        _runGitcoinProposal();
+
+        // Checking that GTC tokens of Radicle treasury has been delegated to Radicle Multisig
+        assertEq(GITCOIN_TOKEN.delegates(address(RADICLE_TIMELOCK)), RAD_MULTISIG);
+        // Checking that GTC Voting power of Radicle Timelock is 0 and Radicle Multisig is GTC.balanceOf(RADICLE_TIMELOCK)
+        assertEq(uint256(GITCOIN_TOKEN.getCurrentVotes(address(RADICLE_TIMELOCK))), 0);
+        assertEq(
+            uint256(GITCOIN_TOKEN.getCurrentVotes(RAD_MULTISIG)),
+            GITCOIN_TOKEN.balanceOf(address(RADICLE_TIMELOCK))
+        );
     }
 
     function testSecondGrantCall() public {
