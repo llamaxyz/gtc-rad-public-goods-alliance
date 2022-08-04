@@ -41,11 +41,10 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
 
     string public constant DESCRIPTION = "GTC <> RAD Public Goods Alliance";
 
-    // To be change-d later
+    // 90 Day TWAP
     uint256 public constant GTC_AMOUNT = 500000e18;
-    uint256 public constant RAD_AMOUNT = 885990e18;
-    uint256 public constant LLAMA_RAD_PAYMENT_AMOUNT = 11765e18;
-    // To be change-d later
+    uint256 public constant RAD_AMOUNT = 680272108e15;
+    uint256 public constant LLAMA_RAD_PAYMENT_AMOUNT = 1003009e16;
 
     GtcRadGrant public gtcRadGrant;
 
@@ -65,7 +64,7 @@ contract GtcRadGrantTest is DSTestPlus, stdCheats {
     ];
 
     function setUp() public {
-        gtcRadGrant = new GtcRadGrant(GTC_AMOUNT, RAD_AMOUNT);
+        gtcRadGrant = new GtcRadGrant();
         vm.label(address(gtcRadGrant), "GtcRadGrant");
 
         vm.label(address(GITCOIN_GOVERNOR), "GITCOIN_GOVERNOR");
